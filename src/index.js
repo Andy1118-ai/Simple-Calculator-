@@ -7,6 +7,7 @@ function PaymentModal({ isOpen, onClose, onSubmit, quote }) {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     const formatKES = (amount) => {
         return new Intl.NumberFormat('en-KE', {
@@ -36,8 +37,6 @@ function PaymentModal({ isOpen, onClose, onSubmit, quote }) {
         }
 
         // Validate M-PESA number format
-        // M-PESA numbers must be registered with Safaricom
-        // They start with +2547 followed by 8 digits
         if (!standardNumber.match(/^\+2547\d{8}$/)) {
             return {
                 isValid: false,
@@ -74,7 +73,17 @@ function PaymentModal({ isOpen, onClose, onSubmit, quote }) {
                 `Enter your M-PESA PIN to complete the payment.`
             );
             
-            onSubmit(validation.number);
+            // Navigate to receipt page with payment details
+            navigate('/receipt', { 
+                state: { 
+                    quote, 
+                    formData: JSON.parse(localStorage.getItem('quoteData')),
+                    paymentDetails: {
+                        phoneNumber: validation.number,
+                        method: 'M-PESA'
+                    }
+                } 
+            });
         } catch (err) {
             setError('Failed to process M-PESA payment. Please try again.');
         } finally {
@@ -200,6 +209,76 @@ function ResultsPage() {
                 onSubmit={handlePayment}
                 quote={quote}
             />
+        </div>
+    );
+}
+
+function ReceiptPage() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { quote, formData, paymentDetails } = location.state || {};
+
+    const formatKES = (amount) => {
+        return new Intl.NumberFormat('en-KE', {
+            style: 'currency',
+            currency: 'KES',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(amount);
+    };
+
+    if (!quote || !formData) {
+        return (
+            <div className="container">
+                <h1 style={{ color: "Red" }}>Error</h1>
+                <p>No receipt data available.</p>
+                <button onClick={() => navigate('/')} className="submit-button">
+                    Calculate New Quote
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="container">
+            <h1 style={{ color: "Black" }}>Payment Receipt</h1>
+            <div className="receipt-content">
+                <div className="receipt-header">
+                    <img src="/images/cicgrouplogo.png" alt="CIC Group Logo" className="logo" />
+                    <h2>Payment Confirmation</h2>
+                </div>
+                
+                <div className="receipt-details">
+                    <h3>Policy Details</h3>
+                    <p><strong>Name:</strong> {formData.firstName} {formData.lastName}</p>
+                    <p><strong>Age:</strong> {formData.age}</p>
+                    <p><strong>Insurance Type:</strong> {formData.insuranceType}</p>
+                    <p><strong>Coverage Level:</strong> {formData.coverageLevel}</p>
+                    <p className="quote-amount"><strong>Amount Paid:</strong> {formatKES(quote)}</p>
+                </div>
+
+                <div className="payment-details">
+                    <h3>Payment Information</h3>
+                    <p><strong>Payment Method:</strong> M-PESA</p>
+                    <p><strong>Phone Number:</strong> {paymentDetails?.phoneNumber}</p>
+                    <p><strong>Transaction Date:</strong> {new Date().toLocaleString()}</p>
+                    <p><strong>Status:</strong> <span className="status-success">Completed</span></p>
+                </div>
+
+                <div className="receipt-footer">
+                    <p>Thank you for choosing CIC Group Insurance!</p>
+                    <p>A confirmation email has been sent to your registered email address.</p>
+                </div>
+
+                <div className="button-group">
+                    <button onClick={() => navigate('/')} className="submit-button">
+                        Calculate New Quote
+                    </button>
+                    <button onClick={() => window.print()} className="submit-button">
+                        Print Receipt
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
@@ -369,6 +448,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<PolicyCalculator />} />
                 <Route path="/results" element={<ResultsPage />} />
+                <Route path="/receipt" element={<ReceiptPage />} />
             </Routes>
         </BrowserRouter>
     );
