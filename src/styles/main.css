@@ -294,3 +294,101 @@ button:hover, button:focus {
     margin-bottom: 1rem;
     font-size: 0.9rem;
 }
+
+/* Receipt Page Styles */
+.receipt-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.receipt-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.receipt-header .logo {
+    position: static;
+    width: 150px;
+    margin-bottom: 1rem;
+}
+
+.receipt-details, .payment-details {
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.receipt-details h3, .payment-details h3 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.receipt-details p, .payment-details p {
+    margin: 0.5rem 0;
+    color: #495057;
+}
+
+.quote-amount {
+    font-size: 1.3rem !important;
+    color: #2c3e50 !important;
+    font-weight: bold !important;
+    margin-top: 1rem !important;
+    padding: 0.5rem;
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
+.status-success {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.receipt-footer {
+    text-align: center;
+    margin: 2rem 0;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.receipt-footer p {
+    margin: 0.5rem 0;
+    color: #495057;
+}
+
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.button-group button {
+    flex: 1;
+    max-width: 200px;
+}
+
+@media print {
+    .button-group {
+        display: none;
+    }
+    
+    .receipt-content {
+        box-shadow: none;
+    }
+    
+    body {
+        background: white;
+    }
+    
+    .container {
+        box-shadow: none;
+        background: none;
+    }
+}
